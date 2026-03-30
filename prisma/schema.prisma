@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(CLIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con el perfil profesional si el usuario es un profesional
+  professionalProfile ProfessionalProfile?
+}
+
+enum Role {
+  CLIENT
+  PROFESSIONAL
+}
+
+model ProfessionalProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  serviceType String   // foto, video, sonido, dron
+  city        String
+  latitude    Float?
+  longitude   Float?
+  bio         String?
+  price       Float?
+  rating      Float    @default(0)
+  reviews     Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
